@@ -6,7 +6,6 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/gnames/gnbhl/config"
 	"github.com/gnames/gnbhl/ent/chunkbhl"
 	"github.com/gnames/gnbhl/ent/pagebhl"
 	"github.com/gnames/gnbhl/internal/fsio"
@@ -14,9 +13,6 @@ import (
 )
 
 type itembhl struct {
-	// cfg is the configuration of gnbhl
-	cfg config.Config
-
 	// id is the unique BHL-assigned ID of the item.
 	id uint
 
@@ -36,8 +32,8 @@ type itembhl struct {
 	pagesBySeq []*pagebhl.PageBHL
 }
 
-func New(cfg config.Config, itemID uint) (ItemBHL, error) {
-	path, err := fsio.GetPath(cfg.Path, itemID)
+func New(rootPath string, itemID uint) (ItemBHL, error) {
+	path, err := fsio.GetPath(rootPath, itemID)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +48,6 @@ func New(cfg config.Config, itemID uint) (ItemBHL, error) {
 	text := strings.Join(txts, "")
 
 	res := &itembhl{
-		cfg:        cfg,
 		id:         itemID,
 		path:       path,
 		pagesByID:  byID,

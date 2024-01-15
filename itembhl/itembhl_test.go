@@ -3,7 +3,6 @@ package itembhl_test
 import (
 	"testing"
 
-	"github.com/gnames/gnbhl/config"
 	"github.com/gnames/gnbhl/itembhl"
 	"github.com/stretchr/testify/assert"
 )
@@ -19,9 +18,8 @@ func TestNew(t *testing.T) {
 	assert.Implements((*itembhl.ItemBHL)(nil), res)
 
 	var err error
-	cfg := config.New(config.OptPath("bad_path"))
 	itemID := uint(100100)
-	res, err = itembhl.New(cfg, itemID)
+	res, err = itembhl.New("bad_path", itemID)
 	assert.NotNil(err)
 	assert.Nil(res)
 }
@@ -93,9 +91,8 @@ func getItem(path string, t *testing.T) itembhl.ItemBHL {
 	if itm != nil {
 		return itm
 	}
-	cfg := config.New(config.OptPath(path))
 	itemID := uint(100100)
-	res, err := itembhl.New(cfg, itemID)
+	res, err := itembhl.New(path, itemID)
 	assert.Nil(err)
 	return res
 }

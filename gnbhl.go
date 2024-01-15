@@ -17,5 +17,5 @@ func New(cfg config.Config) GNBHL {
 }
 
 func (g *gnbhl) Item(itemID uint) (itembhl.ItemBHL, error) {
-	return itembhl.New(g.cfg, itemID)
+	return itembhl.New(g.cfg.Path, itemID)
 }
