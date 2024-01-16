@@ -32,6 +32,7 @@ type itembhl struct {
 	pagesBySeq []*pagebhl.PageBHL
 }
 
+// New creates an instance of ItemBHL.
 func New(rootPath string, itemID uint) (ItemBHL, error) {
 	path, err := fsio.GetPath(rootPath, itemID)
 	if err != nil {
@@ -59,14 +60,19 @@ func New(rootPath string, itemID uint) (ItemBHL, error) {
 	return res, nil
 }
 
+// Pages returns a list of pages in the item. The pages are sorted by their
+// appearance in the item.
 func (itm *itembhl) Pages() []*pagebhl.PageBHL {
 	return itm.pagesBySeq
 }
 
+// Text returns the text of the whole item.
 func (itm *itembhl) Text() string {
 	return itm.text
 }
 
+// Page returns a page by its ID. It also returns the index of the page in the
+// pages' sequence.
 func (itm *itembhl) Page(id uint) (*pagebhl.PageBHL, int, error) {
 	idx, found := slices.BinarySearchFunc(
 		itm.pagesByID, id,
@@ -81,11 +87,14 @@ func (itm *itembhl) Page(id uint) (*pagebhl.PageBHL, int, error) {
 	return itm.pagesByID[idx], idx, nil
 }
 
+// PageByOffset returns a page that contains a given offset. The offset is the
+// number of the UTF-8 characters from the beginning of the item. The offset
+// should be located within the page. It also returns the index of the page in
+// the pages' sequence.
 func (itm *itembhl) PageByOffset(offset uint) (*pagebhl.PageBHL, int, error) {
 	idx, found := slices.BinarySearchFunc(
 		itm.pagesBySeq, offset,
 		func(a *pagebhl.PageBHL, b uint) int {
-			fmt.Printf("SEC: %d, a.Offset: %d, b: %d\n", a.SeqNum, a.Offset, b)
 			if a.Offset > b {
 				return 1
 			}
@@ -101,6 +110,7 @@ func (itm *itembhl) PageByOffset(offset uint) (*pagebhl.PageBHL, int, error) {
 	return itm.pagesBySeq[idx], idx, nil
 }
 
+// PageText returns the text of a page by its ID.
 func (itm *itembhl) PageText(id uint) (string, error) {
 	pg, _, err := itm.Page(id)
 	if err != nil {
@@ -109,6 +119,10 @@ func (itm *itembhl) PageText(id uint) (string, error) {
 	return pg.Text, nil
 }
 
+// Chunk returns a chunk of text by its start and end offsets. The offset is
+// the number of UTF-8 characters from the beginning of the item. The offset
+// should be located within the page. It also returns the index of the page in
+// the pages' sequence.
 func (itm *itembhl) Chunk(start, end uint) (*chunkbhl.ChunkBHL, error) {
 	if start > end {
 		return nil, fmt.Errorf("start offset %d is greater than end offset %d", start, end)
