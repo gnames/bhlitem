@@ -120,31 +120,37 @@ func (itm *itembhl) PageText(id uint) (string, error) {
 }
 
 // Chunk returns a chunk of text by its start and end offsets. The offset is
-// the number of UTF-8 characters from the beginning of the item. The offset
-// should be located within the page. It also returns the index of the page in
-// the pages' sequence.
-func (itm *itembhl) Chunk(start, end uint) (*chunkbhl.ChunkBHL, error) {
+// the number of UTF-8 characters from the beginning of the item.
+// If the chunk is out of bounds, the bounds are adjusted to the beginning or
+// the end of the item.
+func (itm *itembhl) Chunk(start, end int) (*chunkbhl.ChunkBHL, error) {
 	if start > end {
 		return nil, fmt.Errorf("start offset %d is greater than end offset %d", start, end)
 	}
-	if end > itm.length {
-		return nil, fmt.Errorf("end offset %d is greater than item length %d", end, itm.length)
+	l := int(itm.length)
+	if end > l {
+		end = l
 	}
-	_, idxStart, err := itm.PageByOffset(start)
+
+	if start < 0 {
+		start = 0
+	}
+
+	_, idxStart, err := itm.PageByOffset(uint(start))
 	if err != nil {
 		return nil, err
 	}
-	_, idxEnd, err := itm.PageByOffset(end)
+	_, idxEnd, err := itm.PageByOffset(uint(end))
 	if err != nil {
 		return nil, err
 	}
 	chunk := &chunkbhl.ChunkBHL{
-		Start:        start,
-		End:          end,
+		Start:        uint(start),
+		End:          uint(end),
 		PageIdxStart: idxStart,
 		PageIdxEnd:   idxEnd,
 		Pages:        itm.pagesBySeq[idxStart : idxEnd+1],
-		Text:         itm.text[start:end],
+		Text:         itm.Text()[start:end],
 	}
 	return chunk, nil
 }

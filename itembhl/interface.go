@@ -29,5 +29,5 @@ type ItemBHL interface {
 	PageText(id uint) (string, error)
 
 	// Chunk returns a chunk of text by its start and end offsets.
-	Chunk(start, end uint) (*chunkbhl.ChunkBHL, error)
+	Chunk(start, end int) (*chunkbhl.ChunkBHL, error)
 }
