@@ -22,7 +22,7 @@ type itembhl struct {
 	// text is the content of the item.
 	text string
 
-	// length is the length of the item (in runes).
+	// length is the length of the item, text (in runes).
 	length uint
 
 	// pagesByID is a list of pagesByID in the item.
@@ -128,8 +128,8 @@ func (itm *itembhl) Chunk(start, end int) (*chunkbhl.ChunkBHL, error) {
 		return nil, fmt.Errorf("start offset %d is greater than end offset %d", start, end)
 	}
 	l := int(itm.length)
-	if end > l {
-		end = l
+	if end >= l {
+		end = l - 1
 	}
 
 	if start < 0 {

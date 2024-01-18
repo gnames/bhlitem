@@ -68,22 +68,26 @@ func TestOffset(t *testing.T) {
 func TestChunk(t *testing.T) {
 	assert := assert.New(t)
 	res := getItem(path, t)
-	start := uint(13000)
-	end := uint(14000)
-	chk, err := res.Chunk(start, end)
+	start := 13000
+	end := 14000
+	cnk, err := res.Chunk(start, end)
 	assert.Nil(err)
-	assert.Equal(start, chk.Start)
-	assert.Equal(end, chk.End)
-	assert.Equal(1000, len(chk.Text))
-	assert.Equal(2, len(chk.Pages))
-	assert.Equal(uint(17), chk.Pages[0].SeqNum)
-	assert.Equal(uint(18), chk.Pages[1].SeqNum)
+	assert.Equal(uint(start), cnk.Start)
+	assert.Equal(uint(end), cnk.End)
+	assert.Equal(1000, len(cnk.Text))
+	assert.Equal(2, len(cnk.Pages))
+	assert.Equal(uint(17), cnk.Pages[0].SeqNum)
+	assert.Equal(uint(18), cnk.Pages[1].SeqNum)
 
-	chk, err = res.Chunk(end, start)
-	assert.NotNil(err)
-	assert.Nil(chk)
-	_, err = res.Chunk(start, 100_000_000)
-	assert.NotNil(err)
+	cnk, err = res.Chunk(start, 100_000_000)
+	assert.Nil(err)
+	assert.Equal(13000, int(cnk.Start))
+	assert.Equal(50998, int(cnk.End))
+
+	cnk, err = res.Chunk(-50, 100_000_000)
+	assert.Nil(err)
+	assert.Equal(0, int(cnk.Start))
+	assert.Equal(50998, int(cnk.End))
 }
 
 func getItem(path string, t *testing.T) itembhl.ItemBHL {
